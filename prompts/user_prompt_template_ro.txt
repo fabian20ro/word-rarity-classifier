@@ -1,0 +1,33 @@
+Returnează DOAR JSON valid: un ARRAY de obiecte.
+Nu folosi markdown, nu folosi blocuri de cod.
+
+Fiecare obiect are exact câmpurile:
+- word_id (int)
+- word (string)
+- type ("N" | "A" | "V")
+- rarity_level (int 1..5)
+- tag ("common|less_common|rare|technical|regional|archaic|uncertain")
+- confidence (număr 0.0..1.0)
+
+Cerințe:
+- Un element rezultat pentru fiecare intrare.
+- Păstrează ordinea intrărilor.
+- Păstrează `word_id` identic cu input-ul.
+- Păstrează `word` și `type` identice cu input-ul.
+- rarity_level trebuie să fie întreg 1..5.
+- Ordinea nivelurilor este strictă: nivel mai mic = cuvânt mai comun; nivel mai mare = cuvânt mai rar.
+- confidence între 0.0 și 1.0.
+- Nu folosi `null` și nu omite niciun câmp obligatoriu.
+- Nu refuza intrări; dacă ești nesigur, folosește `tag="uncertain"` cu confidence mai mic.
+- Clasifică inclusiv termeni vulgari/obsceni; nu îi exclude.
+- Termenii vulgari/obsceni/insultători/sexual-expliciți nu pot fi nivel 1 sau 2.
+- Pentru astfel de termeni, alege minim nivel 4 (sau 5 dacă sunt extremi).
+- Nivelul 1 este foarte strict: doar vocabular nucleu cunoscut aproape universal.
+- Dacă ești la limită între 1 și 2, preferă 2.
+- Dacă ești la limită între 2 și 3, preferă 3 (cu excepția cuvintelor clar uzuale general).
+- Dacă ești la limită între 3 și 4, preferă 4.
+- Dacă ești la limită între 4 și 5, preferă 4.
+- Fără text înainte/după JSON, fără comentarii.
+
+Intrări:
+{{INPUT_JSON}}

@@ -1,0 +1,19 @@
+Returnează DOAR JSON valid: array de numere întregi (`local_id`).
+Fără text extra, fără markdown, fără blocuri de cod.
+
+Task:
+- Alege cele mai comune intrări din lista de mai jos.
+- Răspunsul trebuie să conțină DOAR `local_id`.
+- Returnează EXACT {{COMMON_COUNT}} id-uri.
+
+Reguli hard:
+- Fără duplicate.
+- Nu inventa id-uri.
+- Folosește numai `local_id`-urile din input.
+- Fiecare id trebuie să fie valid în intervalul 1..N din input.
+- `0` este invalid și interzis.
+- Dacă nu ești sigur, fă cea mai bună alegere.
+- Evită termeni vulgari/obsceni când există alternative.
+
+Input:
+{{INPUT_JSON}}

@@ -617,6 +617,9 @@ def _append_batch_progress(
         },
     }
     _append_json_line(logs.progress_log_path, payload)
+    run_payload = dict(payload)
+    run_payload["event"] = "batch_progress"
+    _append_json_line(logs.run_log_path, run_payload)
 
 
 def _restore_from_checkpoint(dataset: RebalanceDataset, runtime: RebalanceRuntime, logs: Step5Logs) -> Step5ResumeStats:

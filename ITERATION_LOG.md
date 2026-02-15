@@ -20,6 +20,26 @@ Each entry should follow this structure:
 
 ---
 
+### [2026-02-15] Uploaded final rebalance output to Supabase
+
+**Context:** Rebalance run finished with target distribution (`L4=25k`, rest of previous L4 moved to L5).
+**What happened:** Ran `step4-upload` in partial mode for `rb_l4split25k_20260215_134927.csv` and validated DB distribution with direct SQL counts.
+**Outcome:** Success. DB now reflects `1:1234, 2:6610, 3:12517, 4:25000, 5:32337`.
+**Insight:** N/A
+**Promoted to Lessons Learned:** No
+
+---
+
+### [2026-02-15] Mirrored Step5 batch progress into main run log
+
+**Context:** Requested batch progress visibility in the main log stream used for tailing.
+**What happened:** Updated Step5 to append each batch progress payload to both `rebalance/progress/<run>.progress.jsonl` and `rebalance/runs/<run>.jsonl` (`event=batch_progress`), added tests, and ran full unit suite.
+**Outcome:** Success. New/resumed Step5 processes now expose per-batch progress directly in the primary run log.
+**Insight:** Logging progress in the same stream operators already tail reduces observability friction during long retries.
+**Promoted to Lessons Learned:** No
+
+---
+
 ### [2026-02-15] Added Step5 structured progress logs with picked words
 
 **Context:** Needed Step5 logs to show explicit progress and exactly which words were picked per batch.

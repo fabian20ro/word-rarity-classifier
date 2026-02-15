@@ -70,6 +70,9 @@ class Step5ProgressLoggingTest(unittest.TestCase):
             self.assertEqual(row["picked_target_word_ids"], [2])
             self.assertEqual(row["picked_target_words"], ["b"])
             self.assertEqual(row["remaining"], 8)
+            run_row = json.loads(logs.run_log_path.read_text(encoding="utf-8").strip())
+            self.assertEqual(run_row["event"], "batch_progress")
+            self.assertEqual(run_row["batch_index"], 1)
 
     def test_progress_logs_picked_target_words_when_target_is_rare(self):
         with tempfile.TemporaryDirectory() as td:
@@ -108,6 +111,9 @@ class Step5ProgressLoggingTest(unittest.TestCase):
             self.assertEqual(row["picked_target_level"], 3)
             self.assertEqual(row["picked_target_word_ids"], [2])
             self.assertEqual(row["picked_target_words"], ["b"])
+            run_row = json.loads(logs.run_log_path.read_text(encoding="utf-8").strip())
+            self.assertEqual(run_row["event"], "batch_progress")
+            self.assertEqual(run_row["picked_target_level"], 3)
 
 
 if __name__ == "__main__":

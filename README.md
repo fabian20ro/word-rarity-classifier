@@ -23,6 +23,7 @@ Contract this repository must preserve:
 - Step C: multi-run comparator and outlier report (`final_level`)
 - Step D: upload final levels to DB (`partial` default) + upload markers
 - Step E: rebalance from one/two source levels to target level with strict local-id selection
+- Step E emits structured progress logs with per-batch picked words
 - Quality audit: L1 Jaccard + anchor-set precision/recall gates
 - Rarity distribution utility for any run/comparison CSV
 - Interactive low-confidence review app + L1 review gate

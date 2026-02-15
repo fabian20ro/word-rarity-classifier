@@ -20,6 +20,26 @@ Each entry should follow this structure:
 
 ---
 
+### [2026-02-15] Added Step5 structured progress logs with picked words
+
+**Context:** Needed Step5 logs to show explicit progress and exactly which words were picked per batch.
+**What happened:** Added `rebalance/progress/<run>.progress.jsonl` output with per-batch counters and picked word ids/words, kept checkpoint compatibility for resume, added tests, and updated runbook docs.
+**Outcome:** Success. New Step5 runs (or resumed runs after restart) produce progress logs suitable for live tailing and audit.
+**Insight:** Checkpoint-compatible logging allows richer observability without sacrificing resumability.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-02-15] Started level-4 to level-5 rebalance run in tmux
+
+**Context:** Requested rebalance to keep about 25k words on level 4 and move the remainder of current level-4 words to level 5.
+**What happened:** Started Step5 run `rb_l4split25k_20260215_134927` in detached tmux with transition `4:4` and `--lower-ratio 0.45589657` from input `initial_20260215_034523.csv`.
+**Outcome:** In progress. Process is running in tmux and writing Step5 run logs under `build/rarity/rebalance/runs/`.
+**Insight:** For this objective, transition `4:4` is the correct split mode; it controls the kept count in level 4 while moving the rest to level 5.
+**Promoted to Lessons Learned:** No
+
+---
+
 ### [2026-02-15] Uploaded new run and added low-confidence review app with L1 gate
 
 **Context:** Requested production upload of the latest run and a way to continuously validate Level 1 quality with human review.

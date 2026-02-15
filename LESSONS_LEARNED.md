@@ -69,6 +69,7 @@ move it to the Archive section at the bottom with a date and reason.
 <!-- What makes iterations smoother, communication patterns, PR conventions -->
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
 **[2026-02-15]** Keep one lessons source of truth — maintain lessons only in root `LESSONS_LEARNED.md` to prevent drift between duplicated files.
+**[2026-02-15]** Prefer structured per-batch logs for long rebalances — progress JSONL with picked words and counters is easier to monitor and audit than stdout-only output.
 
 ---
 

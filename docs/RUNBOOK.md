@@ -87,6 +87,14 @@ classificator step5-rebalance \
   --transitions "2:1,3:2,4:3"
 ```
 
+Step5 logs (structured):
+
+- LM request/response attempts: `build/rarity/rebalance/runs/<run>.jsonl`
+- Batch progress + picked words: `build/rarity/rebalance/progress/<run>.progress.jsonl`
+- Checkpoints for resume: `build/rarity/rebalance/checkpoints/<run>.checkpoint.jsonl`
+- Switched words: `build/rarity/rebalance/switched_words/<run>.switched.jsonl`
+- Failed batches: `build/rarity/rebalance/failed_batches/<run>.failed.jsonl`
+
 ## 7) Quality Gate (Mandatory Before Upload)
 
 ```bash

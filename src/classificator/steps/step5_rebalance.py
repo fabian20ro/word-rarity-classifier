@@ -74,6 +74,7 @@ class Step5Logs:
     failed_log_path: Path
     switched_words_log_path: Path
     checkpoint_path: Path
+    progress_log_path: Path
 
 
 @dataclass(frozen=True)
@@ -132,6 +133,7 @@ def run_step5(options: Step5Options, *, repo: RunCsvRepository, lm_client: LmStu
         )
     print(f"Step 5 input distribution {runtime.distribution.format()}")
     print(f"Step 5 switched words log: {logs.switched_words_log_path}")
+    print(f"Step 5 progress log: {logs.progress_log_path}")
 
     summaries: list[TransitionSummary] = []
     for transition in transitions:
@@ -252,6 +254,7 @@ def _apply_transition(
     target_assigned = 0
     switched_count = 0
     expected_target_total = round(eligible_count * options.lower_ratio)
+    batch_index = 0
 
     while True:
         batch = _select_stratified_batch(
@@ -263,6 +266,7 @@ def _apply_transition(
         )
         if not batch:
             break
+        batch_index += 1
 
         target_count = _compute_adaptive_target_count(
             processed_before_batch=processed,
@@ -312,6 +316,23 @@ def _apply_transition(
         assigned_to_target = len(selected_common_word_ids) if transition.to_level == common_level else (len(batch) - len(selected_common_word_ids))
         target_assigned += assigned_to_target
         switched_count += len(switched_events)
+
+        _append_batch_progress(
+            logs=logs,
+            options=options,
+            transition=transition,
+            batch_index=batch_index,
+            batch=batch,
+            selected_common_word_ids=selected_common_word_ids,
+            common_level=common_level,
+            processed=processed,
+            eligible_count=eligible_count,
+            target_assigned=target_assigned,
+            expected_target_total=expected_target_total,
+            batch_target=target_count,
+            batch_mix=batch_mix,
+            runtime=runtime,
+        )
 
         _print_switched_events(options, transition, switched_events)
         print(
@@ -541,6 +562,63 @@ def _append_batch_checkpoint(logs: Step5Logs, transition: LevelTransition, proce
     _append_json_line(logs.checkpoint_path, payload)
 
 
+def _append_batch_progress(
+    *,
+    logs: Step5Logs,
+    options: Step5Options,
+    transition: LevelTransition,
+    batch_index: int,
+    batch: list[RebalanceWord],
+    selected_common_word_ids: set[int],
+    common_level: int,
+    processed: int,
+    eligible_count: int,
+    target_assigned: int,
+    expected_target_total: int,
+    batch_target: int,
+    batch_mix: str,
+    runtime: RebalanceRuntime,
+) -> None:
+    batch_by_id = {w.word_id: w for w in batch}
+    selected_common_sorted = sorted(selected_common_word_ids)
+
+    if transition.to_level == common_level:
+        target_word_ids = selected_common_sorted
+    else:
+        target_word_ids = sorted([w.word_id for w in batch if w.word_id not in selected_common_word_ids])
+
+    payload = {
+        "timestamp": datetime.now(tz=timezone.utc).isoformat(),
+        "run_slug": options.run_slug,
+        "transition": f"{transition.describe_sources()}->{transition.to_level}",
+        "batch_index": batch_index,
+        "batch_size": len(batch),
+        "processed": processed,
+        "eligible_total": eligible_count,
+        "remaining": max(0, eligible_count - processed),
+        "target_assigned": target_assigned,
+        "target_expected_total": expected_target_total,
+        "batch_target": batch_target,
+        "batch_mix": batch_mix,
+        "selected_common_level": common_level,
+        "selected_common_count": len(selected_common_sorted),
+        "selected_common_word_ids": selected_common_sorted,
+        "selected_common_words": [batch_by_id[word_id].word for word_id in selected_common_sorted if word_id in batch_by_id],
+        "picked_target_level": transition.to_level,
+        "picked_target_count": len(target_word_ids),
+        "picked_target_word_ids": target_word_ids,
+        "picked_target_words": [batch_by_id[word_id].word for word_id in target_word_ids if word_id in batch_by_id],
+        "distribution": {
+            "1": runtime.distribution.count(1),
+            "2": runtime.distribution.count(2),
+            "3": runtime.distribution.count(3),
+            "4": runtime.distribution.count(4),
+            "5": runtime.distribution.count(5),
+        },
+    }
+    _append_json_line(logs.progress_log_path, payload)
+
+
 def _restore_from_checkpoint(dataset: RebalanceDataset, runtime: RebalanceRuntime, logs: Step5Logs) -> Step5ResumeStats:
     if not logs.checkpoint_path.exists():
         return Step5ResumeStats(0, 0, 0)
@@ -667,17 +745,20 @@ def _prepare_logs(output_dir: Path, run_slug: str) -> Step5Logs:
     failed_dir = output_dir / "rebalance" / "failed_batches"
     switched_dir = output_dir / "rebalance" / "switched_words"
     checkpoint_dir = output_dir / "rebalance" / "checkpoints"
+    progress_dir = output_dir / "rebalance" / "progress"
 
     runs_dir.mkdir(parents=True, exist_ok=True)
     failed_dir.mkdir(parents=True, exist_ok=True)
     switched_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
+    progress_dir.mkdir(parents=True, exist_ok=True)
 
     return Step5Logs(
         run_log_path=runs_dir / f"{run_slug}.jsonl",
         failed_log_path=failed_dir / f"{run_slug}.failed.jsonl",
         switched_words_log_path=switched_dir / f"{run_slug}.switched.jsonl",
         checkpoint_path=checkpoint_dir / f"{run_slug}.checkpoint.jsonl",
+        progress_log_path=progress_dir / f"{run_slug}.progress.jsonl",
     )
 
 

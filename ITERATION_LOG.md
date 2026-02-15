@@ -20,6 +20,26 @@ Each entry should follow this structure:
 
 ---
 
+### [2026-02-15] Compared latest Step2 run with current DB rarity levels
+
+**Context:** Needed Jaccard and distribution comparison between latest generated run and currently stored DB levels.
+**What happened:** Exported current DB levels to `build/rarity/reference/current_db_levels.csv`, ran `rarity-distribution` on candidate/reference, then ran `quality-audit` with `--reference-csv`.
+**Outcome:** Success. Produced L1 Jaccard and side-by-side distribution snapshots for direct comparison.
+**Insight:** N/A
+**Promoted to Lessons Learned:** No
+
+---
+
+### [2026-02-15] Added rarity-distribution CLI utility and docs integration
+
+**Context:** Needed a quick way to inspect rarity level distribution directly from generated CSV outputs.
+**What happened:** Implemented `classificator rarity-distribution` (alias `dist`), added parser/tests, updated README/RUNBOOK/AGENTS docs, and executed it on the latest Step2 output.
+**Outcome:** Success. Distribution can now be checked with a single command and is integrated into operational docs.
+**Insight:** Fast distribution visibility helps catch obvious skew earlier in the pipeline.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 ### [2026-02-15] Consolidated lessons into single root file
 
 **Context:** Requested to merge duplicate lessons files into the root project lessons file.

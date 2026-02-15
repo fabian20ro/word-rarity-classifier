@@ -61,6 +61,7 @@ This project maintains a persistent learning system across AI agent sessions.
 - Step3 compare: `classificator step3-compare ...`
 - Step5 rebalance: `classificator step5-rebalance ...`
 - Quality gate: `classificator quality-audit ...`
+- Distribution check: `classificator rarity-distribution --csv <run.csv>`
 - Step4 upload: `classificator step4-upload --final-csv <candidate.csv>`
 
 ## File Map

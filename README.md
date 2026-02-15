@@ -24,6 +24,7 @@ Contract this repository must preserve:
 - Step D: upload final levels to DB (`partial` default) + upload markers
 - Step E: rebalance from one/two source levels to target level with strict local-id selection
 - Quality audit: L1 Jaccard + anchor-set precision/recall gates
+- Rarity distribution utility for any run/comparison CSV
 - Retry input builder from failed JSONL
 - Chained target-distribution rebalancer with built-in quality gate
 
@@ -86,6 +87,9 @@ classificator quality-audit \
   --anchor-l1-file docs/rarity-anchor-l1-ro.txt \
   --min-l1-jaccard 0.80 \
   --min-anchor-l1-precision 0.90
+
+# Distribution check
+classificator rarity-distribution --csv build/rarity/runs/campaign_a.rebalanced.csv
 
 # D) Upload to DB (partial default)
 classificator step4-upload --final-csv build/rarity/runs/campaign_a.rebalanced.csv

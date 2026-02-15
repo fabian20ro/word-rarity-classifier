@@ -28,6 +28,7 @@ from .steps.step5_rebalance import Step5Options, run_step5
 from .tools.build_retry_input import build_retry_input
 from .tools.chain_rebalance_target_dist import ChainOptions, run_chain_rebalance
 from .tools.quality_audit import run_quality_audit
+from .tools.rarity_distribution import run_rarity_distribution
 from .transitions import (
     LevelTransition,
     parse_transitions,
@@ -158,6 +159,14 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0 if result.passed else 1
 
+    if args.command in {"rarity-distribution", "dist"}:
+        run_rarity_distribution(
+            csv_path=Path(args.csv),
+            level_column=args.level_column,
+            repo=repo,
+        )
+        return 0
+
     if args.command == "build-retry-input":
         rows = build_retry_input(
             failed_jsonl=Path(args.failed_jsonl),
@@ -241,6 +250,13 @@ def _build_parser() -> argparse.ArgumentParser:
     qa.add_argument("--min-l1-jaccard", type=float)
     qa.add_argument("--min-anchor-l1-precision", type=float)
     qa.add_argument("--min-anchor-l1-recall", type=float)
+
+    rd = sub.add_parser("rarity-distribution", help="Print rarity level distribution for a CSV")
+    rd.add_argument("--csv", required=True)
+    rd.add_argument("--level-column", help="Optional explicit level column (e.g. rarity_level/final_level)")
+    rda = sub.add_parser("dist", help="Alias of rarity-distribution")
+    rda.add_argument("--csv", required=True)
+    rda.add_argument("--level-column", help="Optional explicit level column (e.g. rarity_level/final_level)")
 
     br = sub.add_parser("build-retry-input", help="Build retry input CSV from failed JSONL")
     br.add_argument("--failed-jsonl", required=True)

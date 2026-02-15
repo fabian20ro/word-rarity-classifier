@@ -48,6 +48,7 @@ move it to the Archive section at the bottom with a date and reason.
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
 **[2026-02-14]** Histogram fit is insufficient as a release gate — upload candidates need semantic checks (L1 Jaccard plus anchor precision/recall), not just target distribution match.
 **[2026-02-14]** Anchor coverage must grow over time — small anchor sets are only seed protection and should be curated/expanded to keep precision-recall gates meaningful.
+**[2026-02-15]** Add a fast distribution check before deep audits — `classificator rarity-distribution` gives immediate sanity checks on level skew before running heavier quality gates.
 
 ## Performance & Infrastructure
 

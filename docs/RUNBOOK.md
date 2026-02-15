@@ -117,6 +117,21 @@ classificator step4-upload --final-csv build/rarity/runs/campaign_a.rebalanced.c
 
 ## 9) Utilities
 
+Rarity distribution from any run/comparison CSV:
+
+```bash
+classificator rarity-distribution \
+  --csv build/rarity/runs/campaign_a.csv
+```
+
+Explicit level column (if needed):
+
+```bash
+classificator rarity-distribution \
+  --csv build/rarity/step3_comparison.csv \
+  --level-column final_level
+```
+
 Retry input from failed JSONL:
 
 ```bash

@@ -9,11 +9,24 @@ Classify Romanian lexical rarity (`1..5`) with robust offline orchestration:
 - strict rebalance contracts,
 - gated uploads (Jaccard + anchor precision/recall).
 
+## Repository Boundary
+
+This repository is the source of truth for offline rarity classification.
+`fabian20ro/propozitii-nostime` consumes `words.rarity_level` at runtime, but does not host classifier runtime code, prompts, or orchestration.
+
 ## Why Python
 
 - Better data tooling for batch CSV analysis and audits.
 - Faster iteration on parser/repair heuristics and experiment scripts.
 - Easier standalone extraction as a dedicated classification repo.
+
+## Implementation Shape
+
+- Python CLI + modular pipeline steps.
+- CSV-first and resumable execution.
+- Strict parser/schema enforcement around LM JSON.
+- Rebalance transitions with checkpoints and recoverable state.
+- Prompt assets + quality-audit tooling + optional chained rebalance helper.
 
 ## Step Model
 
@@ -37,12 +50,19 @@ Classify Romanian lexical rarity (`1..5`) with robust offline orchestration:
 
 ## Quality Gate Contract
 
-Before upload, candidate CSV should pass:
+Before upload, candidate CSV must pass:
 
 - L1 Jaccard against trusted reference run (`word_id` set overlap stability),
 - L1 anchor precision/recall from curated Romanian base vocabulary anchors.
 
 This protects against superficially correct histograms with semantically poor L1 content.
+
+## Data Contracts
+
+- Level semantics: lower number means more common word.
+- Output values are constrained to `1..5`.
+- Step5 selection mode uses local batch ids only (`1..N`, unique, exact count, no `0`).
+- Step4 upload default mode is `partial`.
 
 ## Artifact Layout
 

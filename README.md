@@ -2,7 +2,19 @@
 
 Standalone Python reimplementation of the Romanian rarity classification pipeline.
 
-This project is meant to be extracted as its own repository. It reads words from Supabase PostgreSQL, writes intermediary CSV/JSONL artifacts, runs LM scoring/rebalancing, and uploads final levels back to Supabase.
+This repository is the active home of the offline rarity-classification system previously hosted inside `fabian20ro/propozitii-nostime`.
+It reads words from Supabase PostgreSQL, writes intermediary CSV/JSONL artifacts, runs LM scoring/rebalancing, and uploads final levels back to Supabase.
+
+## Integration Boundary
+
+Downstream app `fabian20ro/propozitii-nostime` does not run classifier steps at runtime.
+It only consumes `words.rarity_level` via `minRarity`/`rarity` query parameters.
+
+Contract this repository must preserve:
+
+- `rarity_level` stays in `1..5`
+- lower number means more common word
+- uploads are explicit and auditable
 
 ## What It Includes
 
@@ -14,6 +26,13 @@ This project is meant to be extracted as its own repository. It reads words from
 - Quality audit: L1 Jaccard + anchor-set precision/recall gates
 - Retry input builder from failed JSONL
 - Chained target-distribution rebalancer with built-in quality gate
+
+## Data Contracts
+
+- Level semantics: lower number = more common.
+- Output levels are constrained to `1..5`.
+- Step5 selection ids are batch-local (`local_id` in `1..N`), unique, exact count, no `0`.
+- Upload mode default is `partial`; use `full-fallback` only intentionally.
 
 ## Install
 
@@ -79,7 +98,7 @@ classificator step4-upload --final-csv build/rarity/runs/campaign_a.rebalanced.c
 - `docs/RUNBOOK.md` execution guide
 - `docs/PIPELINE_DESIGN.md` design decisions and why
 - `docs/HANDOVER.md` operator handover (do/don't + troubleshooting)
-- `docs/LESSONS_LEARNED.md` historical pitfalls and safeguards
+- `LESSONS_LEARNED.md` historical pitfalls and safeguards
 - `docs/rarity-anchor-l1-ro.txt` seed L1 anchor set
 
 ## Tests

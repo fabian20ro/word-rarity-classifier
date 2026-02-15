@@ -29,31 +29,44 @@ move it to the Archive section at the bottom with a date and reason.
 
 <!-- Insights about system design, patterns that work/don't work in this codebase -->
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
+**[2026-02-14]** Classifier/consumer boundary must stay explicit — `word-rarity-classifier` owns pipeline runtime and artifacts; downstream apps only consume `words.rarity_level`.
+**[2026-02-14]** CSV-first orchestration is a reliability feature — reproducible step artifacts plus checkpoints are required for multi-hour recovery and auditability.
 
 ## Code Patterns & Pitfalls
 
 <!-- Language/framework-specific gotchas discovered in this project -->
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
+**[2026-02-14]** Step5 id domain must remain batch-local — selection output must use only `local_id` in `1..N`; mixing in `word_id` or allowing `0` creates silent corruption risk.
+**[2026-02-14]** Prompt/parser contract drift causes hard failures — exact-count semantics and id rules must match verbatim between prompt text and parser validation.
+**[2026-02-14]** Prompt wording is a behavior contract — small phrasing edits can materially shift L1 composition; treat prompt files as versioned assets.
+**[2026-02-14]** Strict parsing beats permissive autofill — long rebalance campaigns are safer when malformed LM selections fail fast instead of being auto-completed.
+**[2026-02-14]** Deterministic decode profiles improve JSON stability — lower-variance decoding (for example `temperature=0`) reduces structured-output breakage.
 
 ## Testing & Quality
 
 <!-- What breaks, what's flaky, what testing strategies work here -->
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
+**[2026-02-14]** Histogram fit is insufficient as a release gate — upload candidates need semantic checks (L1 Jaccard plus anchor precision/recall), not just target distribution match.
+**[2026-02-14]** Anchor coverage must grow over time — small anchor sets are only seed protection and should be curated/expanded to keep precision-recall gates meaningful.
 
 ## Performance & Infrastructure
 
 <!-- Deployment quirks, scaling lessons, CI/CD gotchas -->
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
+**[2026-02-14]** Local model instability requires bounded recovery tactics — retries, partial salvage, and capped batch splitting are necessary for predictable throughput.
+**[2026-02-14]** Pair-level rebalance works better with stratified source mixing — mixed batches from both source levels reduce unstable transitions.
 
 ## Dependencies & External Services
 
 <!-- Version constraints, API quirks, integration lessons -->
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
+**[2026-02-14]** Upload default should stay partial — only rows present in candidate CSV should update by default; `full-fallback` is an explicit exception mode.
 
 ## Process & Workflow
 
 <!-- What makes iterations smoother, communication patterns, PR conventions -->
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
+**[2026-02-15]** Keep one lessons source of truth — maintain lessons only in root `LESSONS_LEARNED.md` to prevent drift between duplicated files.
 
 ---
 

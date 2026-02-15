@@ -4,7 +4,8 @@
 
 1. Read `README.md` and `AGENTS.md`.
 2. Read `docs/PIPELINE_DESIGN.md` and `docs/RUNBOOK.md`.
-3. Install deps:
+3. Internalize integration boundary: this repo owns classifier runtime; `propozitii-nostime` only consumes `words.rarity_level`.
+4. Install deps:
 
 ```bash
 python -m venv .venv
@@ -12,7 +13,7 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-4. Run tests:
+5. Run tests:
 
 ```bash
 PYTHONPATH=src python -m unittest discover -s tests -p 'test_*.py'

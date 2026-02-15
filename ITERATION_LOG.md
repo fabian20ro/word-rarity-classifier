@@ -20,6 +20,16 @@ Each entry should follow this structure:
 
 ---
 
+### [2026-02-15] Uploaded new run and added low-confidence review app with L1 gate
+
+**Context:** Requested production upload of the latest run and a way to continuously validate Level 1 quality with human review.
+**What happened:** Uploaded `build/rarity/runs/initial_20260215_034523.csv` via `step4-upload` (partial), implemented `review-low-confidence`/`review` interactive labeling app, implemented `l1-review-check` threshold gate, and integrated docs/tests.
+**Outcome:** Success. New rarity levels are uploaded, and an operator workflow now exists to review lowest-confidence words and enforce L1 precision thresholds.
+**Insight:** Combining anchor checks with recurring low-confidence human review gives stronger L1 protection than either alone.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 ### [2026-02-15] Compared latest Step2 run with current DB rarity levels
 
 **Context:** Needed Jaccard and distribution comparison between latest generated run and currently stored DB levels.

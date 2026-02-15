@@ -37,6 +37,7 @@ Do:
 
 - Keep rebalance prompts strict and schema-driven.
 - Gate every upload with Jaccard + anchor metrics.
+- Run low-confidence L1 human review regularly (`review-low-confidence` + `l1-review-check`).
 - Expand anchor list over time (target >= 400 curated L1 words).
 - Preserve partial upload default during iteration.
 

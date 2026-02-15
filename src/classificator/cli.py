@@ -29,6 +29,7 @@ from .tools.build_retry_input import build_retry_input
 from .tools.chain_rebalance_target_dist import ChainOptions, run_chain_rebalance
 from .tools.quality_audit import run_quality_audit
 from .tools.rarity_distribution import run_rarity_distribution
+from .tools.review_low_confidence import parse_only_levels, run_l1_review_check, run_review_low_confidence
 from .transitions import (
     LevelTransition,
     parse_transitions,
@@ -167,6 +168,27 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
+    if args.command in {"review-low-confidence", "review"}:
+        run_review_low_confidence(
+            csv_path=Path(args.csv),
+            labels_csv=Path(args.labels_csv),
+            repo=repo,
+            level_column=args.level_column,
+            confidence_column=args.confidence_column,
+            only_levels=parse_only_levels(args.only_levels),
+            max_items=args.max_items,
+            include_undecided=args.include_undecided,
+        )
+        return 0
+
+    if args.command == "l1-review-check":
+        run_l1_review_check(
+            labels_csv=Path(args.labels_csv),
+            min_precision=args.min_precision,
+            min_reviewed=args.min_reviewed,
+        )
+        return 0
+
     if args.command == "build-retry-input":
         rows = build_retry_input(
             failed_jsonl=Path(args.failed_jsonl),
@@ -257,6 +279,28 @@ def _build_parser() -> argparse.ArgumentParser:
     rda = sub.add_parser("dist", help="Alias of rarity-distribution")
     rda.add_argument("--csv", required=True)
     rda.add_argument("--level-column", help="Optional explicit level column (e.g. rarity_level/final_level)")
+
+    rv = sub.add_parser("review-low-confidence", help="Interactive review of lowest-confidence words")
+    rv.add_argument("--csv", required=True)
+    rv.add_argument("--labels-csv", default="build/rarity/review_labels.csv")
+    rv.add_argument("--level-column")
+    rv.add_argument("--confidence-column", default="confidence")
+    rv.add_argument("--only-levels", help="Comma-separated levels to include (e.g. 1 or 1,2,3)")
+    rv.add_argument("--max-items", type=int, default=200)
+    rv.add_argument("--include-undecided", action=argparse.BooleanOptionalAction, default=False)
+    rva = sub.add_parser("review", help="Alias of review-low-confidence")
+    rva.add_argument("--csv", required=True)
+    rva.add_argument("--labels-csv", default="build/rarity/review_labels.csv")
+    rva.add_argument("--level-column")
+    rva.add_argument("--confidence-column", default="confidence")
+    rva.add_argument("--only-levels", help="Comma-separated levels to include (e.g. 1 or 1,2,3)")
+    rva.add_argument("--max-items", type=int, default=200)
+    rva.add_argument("--include-undecided", action=argparse.BooleanOptionalAction, default=False)
+
+    l1c = sub.add_parser("l1-review-check", help="Gate L1 quality from human review labels")
+    l1c.add_argument("--labels-csv", default="build/rarity/review_labels.csv")
+    l1c.add_argument("--min-precision", type=float)
+    l1c.add_argument("--min-reviewed", type=int)
 
     br = sub.add_parser("build-retry-input", help="Build retry input CSV from failed JSONL")
     br.add_argument("--failed-jsonl", required=True)

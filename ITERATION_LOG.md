@@ -20,6 +20,26 @@ Each entry should follow this structure:
 
 ---
 
+### [2026-02-20] Restored rarity after reset by remapping shifted word IDs
+
+**Context:** Requested immediate upload of the latest computed rarity file after DB rarity was reset to level 4 for all rows.
+**What happened:** Ran `step4-upload` on the latest CSV and got `updated=0` with all rows `missing_db_word`; verified DB `words.id` range shifted (`155397..233094`) versus candidate IDs (`77699..155396`); validated deterministic remap `new_id = old_id + 77698` against DB samples; generated remapped CSV `rb_l4split25k_20260215_134927.idshift77698.csv`; reran `step4-upload --mode partial` successfully.
+**Outcome:** Success. Upload updated `77,698` rows and DB rarity distribution is now `1:1234, 2:6610, 3:12517, 4:25000, 5:32337` (not all 4 anymore).
+**Insight:** After table recreation/reset, ID domains may shift even when `(word,type)` content is unchanged; step4 partial uploads can silently become no-op with `missing_db_word` unless IDs are remapped.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-02-20] Added rarity-only upload regression test and blocked restore upload on gate failure
+
+**Context:** Requested restoration of `words.rarity_level` after DB was reset to 4 for all rows, using the latest computed CSV while ensuring schema additions are not overwritten.
+**What happened:** Added `tests/test_word_store.py` to assert `update_rarity_levels_chunked` executes only `UPDATE words SET rarity_level = %s WHERE id = %s` with `(level, word_id)` payloads and no-op behavior for empty updates; ran full unit suite; validated candidate CSV integrity/distribution; ran mandatory `quality-audit` against `build/rarity/reference/current_db_levels.csv`.
+**Outcome:** Partial success. Code safety test and unit suite passed, but quality gate failed (`l1_jaccard=0.0267`, `anchor_l1_precision=0.0479`, `anchor_l1_recall=0.4219`), so upload was not executed per policy.
+**Insight:** Recovery uploads can be intentionally blocked by strict reference-based gates when candidate and reference represent different states; gate policy/reference selection must match the restore objective.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 ### [2026-02-15] Uploaded final rebalance output to Supabase
 
 **Context:** Rebalance run finished with target distribution (`L4=25k`, rest of previous L4 moved to L5).

@@ -41,6 +41,7 @@ move it to the Archive section at the bottom with a date and reason.
 **[2026-02-14]** Prompt wording is a behavior contract — small phrasing edits can materially shift L1 composition; treat prompt files as versioned assets.
 **[2026-02-14]** Strict parsing beats permissive autofill — long rebalance campaigns are safer when malformed LM selections fail fast instead of being auto-completed.
 **[2026-02-14]** Deterministic decode profiles improve JSON stability — lower-variance decoding (for example `temperature=0`) reduces structured-output breakage.
+**[2026-02-20]** Reset/reimport can invalidate `word_id` alignment — if Step4 report is all `missing_db_word`, verify DB `id` range before retrying; remap candidate IDs deterministically (for example fixed offset) and keep upload mode `partial` so only `rarity_level` is changed.
 
 ## Testing & Quality
 
@@ -50,6 +51,7 @@ move it to the Archive section at the bottom with a date and reason.
 **[2026-02-14]** Anchor coverage must grow over time — small anchor sets are only seed protection and should be curated/expanded to keep precision-recall gates meaningful.
 **[2026-02-15]** Add a fast distribution check before deep audits — `classificator rarity-distribution` gives immediate sanity checks on level skew before running heavier quality gates.
 **[2026-02-15]** L1 quality needs a human loop on weakest-confidence items — use `review-low-confidence --only-levels 1` plus `l1-review-check` thresholds as an ongoing gate.
+**[2026-02-20]** Recovery uploads need goal-aligned reference gating — when DB is reset or intentionally diverged, strict Jaccard/anchor thresholds against stale reference snapshots can block valid restores; confirm/refresh reference policy before running mandatory gates.
 
 ## Performance & Infrastructure
 

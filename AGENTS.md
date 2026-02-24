@@ -1,83 +1,61 @@
 # AGENTS.md
 
-Operating guide for contributors working in this standalone rarity-classification project.
+> Non-discoverable operating constraints for AI agents.
+> If the model can find it in the codebase, it does not belong here.
+> For corrections and patterns, see `LESSONS_LEARNED.md`.
 
-## Mission
+## Constraints
 
-Maintain a reliable Romanian lexical rarity pipeline that:
-- reads source words from Supabase PostgreSQL,
-- classifies/rebalances with local LLMs using strict JSON contracts,
-- writes reproducible intermediary CSV/JSONL artifacts,
-- uploads validated levels back to Supabase only after quality gates pass.
+1. **Step5 selection contract is strict.**
+   LM output must be exact-count local ids (`1..N`, no duplicates, no `0`).
+   Never reintroduce silent auto-fill of missing selections.
 
-## Memory & Continuous Learning
+2. **Upload gating is mandatory.**
+   Pre-upload candidate must be checked with Jaccard and anchor precision/recall.
+   Do not upload based only on histogram fit.
 
-This project maintains a persistent learning system across AI agent sessions.
+3. **CSV-first operation.**
+   Keep all step artifacts explicit and resumable.
+   Avoid hidden in-memory-only workflows.
 
-### Required Workflow
+4. **Upload mode default is `partial`.**
+   Use `full-fallback` only with explicit intent.
 
-1. **Start of task:** Read `LESSONS_LEARNED.md` before writing any code
-2. **During work:** Note any surprises, gotchas, or non-obvious discoveries
+## Legacy & Deprecated
+
+<!-- Parts of the codebase that would actively mislead the model.
+     Add entries here only for non-obvious traps. Remove when the code is cleaned up. -->
+
+## Learning System
+
+This project uses a persistent learning system. Follow this workflow every session:
+
+1. **Start of task:** Read `LESSONS_LEARNED.md` — it contains validated corrections and patterns
+2. **During work:** Note any surprises or non-obvious discoveries
 3. **End of iteration:** Append to `ITERATION_LOG.md` with what happened
-4. **End of iteration:** If the insight is reusable and validated, also add to `LESSONS_LEARNED.md`
-5. **Pattern detection:** If the same issue appears 2+ times in the log, promote it to a lesson
-
-### Files
+4. **If insight is reusable and validated:** Also add to `LESSONS_LEARNED.md`
+5. **If same issue appears 2+ times in log:** Promote to `LESSONS_LEARNED.md`
+6. **If something surprised you:** Flag it to the developer
 
 | File | Purpose | When to Write |
 |------|---------|---------------|
-| `LESSONS_LEARNED.md` | Curated, validated, reusable wisdom | End of iteration (if insight is reusable) |
-| `ITERATION_LOG.md` | Raw session journal, append-only | End of every iteration (always) |
+| `LESSONS_LEARNED.md` | Curated, validated wisdom and corrections | When insight is reusable |
+| `ITERATION_LOG.md` | Raw session journal (append-only, never delete) | Every iteration (always) |
 
-### Rules
+Rules: Never delete from ITERATION_LOG. Obsolete lessons → Archive section in LESSONS_LEARNED (not deleted). Date-stamp everything YYYY-MM-DD. When in doubt: log it.
 
-- Never delete entries from `ITERATION_LOG.md` — it's append-only
-- In `LESSONS_LEARNED.md`, obsolete lessons go to the Archive section, not deleted
-- Keep entries concise — a future agent scanning 100 entries needs signal, not prose
-- Date-stamp everything in `YYYY-MM-DD` format
-- When in doubt about whether something is worth logging: log it
+### Periodic Maintenance
 
-## Core Rules
+- Review `LESSONS_LEARNED.md` quarterly; archive stale entries
+- After major pipeline changes, verify sub-agent files still apply
+- AGENTS.md should shrink over time, not grow — prefer fixing the codebase over adding entries here
 
-1. Step5 selection contract is strict.
-- LM output must be exact-count local ids (`1..N`, no duplicates, no `0`).
-- Never reintroduce silent auto-fill of missing selections.
+## Sub-Agents
 
-2. Upload gating is mandatory.
-- Pre-upload candidate must be checked with Jaccard and anchor precision/recall.
-- Do not upload based only on histogram fit.
+Specialized agents in `.claude/agents/`. Invoke proactively — don't wait to be asked.
 
-3. CSV-first operation.
-- Keep all step artifacts explicit and resumable.
-- Avoid hidden in-memory-only workflows.
-
-4. Upload mode default is `partial`.
-- Use `full-fallback` only with explicit intent.
-
-## Quick Commands
-
-- Step1 export: `classificator step1-export --output-csv build/rarity/step1_words.csv`
-- Step2 score: `classificator step2-score ...`
-- Step3 compare: `classificator step3-compare ...`
-- Step5 rebalance: `classificator step5-rebalance ...`
-- Quality gate: `classificator quality-audit ...`
-- Distribution check: `classificator rarity-distribution --csv <run.csv>`
-- Review app: `classificator review-low-confidence --csv <run.csv> --only-levels 1`
-- L1 review gate: `classificator l1-review-check --labels-csv build/rarity/review_labels.csv ...`
-- Step4 upload: `classificator step4-upload --final-csv <candidate.csv>`
-
-## File Map
-
-- CLI: `src/classificator/cli.py`
-- LM client/parser: `src/classificator/lm/`
-- Step modules: `src/classificator/steps/`
-- Tooling: `src/classificator/tools/`
-- Runbook: `docs/RUNBOOK.md`
-- Handover and guardrails: `docs/HANDOVER.md`
-
-## Testing Expectations
-
-Before handoff:
-- run unit tests (`python -m unittest discover -s tests -p 'test_*.py'`),
-- run at least one quality-audit smoke command,
-- if LM/DB behavior changed, include an operator note in docs.
+| Agent | File | Invoke When |
+|-------|------|-------------|
+| Architect | `.claude/agents/architect.md` | System design, scalability, refactoring, ADRs |
+| Planner | `.claude/agents/planner.md` | Complex multi-step features — plan before coding |
+| Agent Creator | `.claude/agents/agent-creator.md` | Need a new specialized agent for a recurring task domain |

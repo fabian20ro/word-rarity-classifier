@@ -1,8 +1,9 @@
 # AGENTS.md
 
-> Non-discoverable operating constraints for AI agents.
-> If the model can find it in the codebase, it does not belong here.
-> For corrections and patterns, see `LESSONS_LEARNED.md`.
+work style: telegraph; noun-phrases ok; drop grammar; min tokens.
+
+> bootstrap context only. discoverable from codebase → don't put here.
+> corrections + patterns → LESSONS_LEARNED.md.
 
 ## Constraints
 
@@ -45,10 +46,10 @@ This project uses a persistent learning system. Follow this workflow every sessi
 Rules: Never delete from ITERATION_LOG. Obsolete lessons → Archive section in LESSONS_LEARNED (not deleted). Date-stamp everything YYYY-MM-DD. When in doubt: log it.
 
 ### Periodic Maintenance
+Config files audited periodically via `SETUP_AI_AGENT_CONFIG.md`.
+See "Periodic Maintenance Protocol" section.
 
-- Review `LESSONS_LEARNED.md` quarterly; archive stale entries
-- After major pipeline changes, verify sub-agent files still apply
-- AGENTS.md should shrink over time, not grow — prefer fixing the codebase over adding entries here
+AGENTS.md should shrink over time, not grow — prefer fixing the codebase over adding entries here.
 
 ## Sub-Agents
 
